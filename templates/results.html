@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Analysis Results</title>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+<body>
+    <main class="container">
+        <a class="back-link" href="/">← New analysis</a>
+        <h1>Analysis Results</h1>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% else %}
+            <section class="panel">
+                <h2>Scientific summary</h2>
+                <p>{{ summary }}</p>
+            </section>
+
+            {% if mode == "protein" %}
+                <section class="panel">
+                    <h2>Protein analysis</h2>
+                    <p>
+                        Sequence length:
+                        <strong>{{ sequence_length }}</strong>
+                        amino acids
+                    </p>
+
+                    {% if similar_targets %}
+                        <h3>Closest reference targets</h3>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Protein</th>
+                                        <th>Gene</th>
+                                        <th>UniProt</th>
+                                        <th>Type</th>
+                                        <th>Similarity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for target in similar_targets %}
+                                        <tr>
+                                            <td>{{ target.name }}</td>
+                                            <td>{{ target.gene }}</td>
+                                            <td>{{ target.uniprot_id }}</td>
+                                            <td>{{ target.target_type }}</td>
+                                            <td>
+                                                {{ "%.3f"|format(
+                                                    target.similarity
+                                                ) }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </section>
+            {% endif %}
+
+            {% if mode == "drug" %}
+                <section class="panel">
+                    <h2>Compound properties</h2>
+                    <div class="property-grid">
+                        <div><span>Name</span>{{ compound.name }}</div>
+                        <div><span>PubChem CID</span>{{ compound.cid }}</div>
+                        <div>
+                            <span>Formula</span>
+                            {{ compound.MolecularFormula or "N/A" }}
+                        </div>
+                        <div>
+                            <span>Molecular weight</span>
+                            {{ compound.MolecularWeight or "N/A" }}
+                        </div>
+                        <div>
+                            <span>XLogP</span>
+                            {{ compound.XLogP or "N/A" }}
+                        </div>
+                        <div>
+                            <span>TPSA</span>
+                            {{ compound.TPSA or "N/A" }}
+                        </div>
+                    </div>
+
+                    {% if chembl_molecule %}
+                        <p>
+                            ChEMBL match:
+                            <strong>
+                                {{ chembl_molecule.chembl_id }}
+                            </strong>
+                        </p>
+                    {% endif %}
+                </section>
+
+                {% if structure_image %}
+                    <section class="panel">
+                        <h2>Molecular structure</h2>
+                        <img
+                            src="{{ url_for(
+                                'static',
+                                filename=structure_image
+                            ) }}"
+                            alt="Two-dimensional molecular structure"
+                        >
+                    </section>
+                {% endif %}
+
+                {% if lipinski %}
+                    <section class="panel">
+                        <h2>Property filters</h2>
+                        <p>
+                            Passed {{ lipinski.passed }} of
+                            {{ lipinski.total }} basic filters.
+                        </p>
+                        <ul>
+                            {% for label, passed in lipinski.checks.items() %}
+                                <li>
+                                    {{ "Pass" if passed else "Does not pass" }}
+                                    — {{ label }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <small>
+                            These filters do not guarantee absorption,
+                            safety, or successful drug development.
+                        </small>
+                    </section>
+                {% endif %}
+            {% endif %}
+
+            {% if chart_html %}
+                <section class="panel">
+                    <h2>Interaction visualization</h2>
+                    {{ chart_html | safe }}
+                </section>
+            {% endif %}
+
+            {% if interactions %}
+                <section class="panel">
+                    <h2>Ranked interaction evidence</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Target</th>
+                                    <th>Activity</th>
+                                    <th>Value</th>
+                                    <th>pChEMBL</th>
+                                    <th>Evidence score</th>
+                                    <th>Source record</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in interactions %}
+                                    <tr>
+                                        <td>
+                                            {{ item.target_name
+                                                or item.target_chembl_id }}
+                                        </td>
+                                        <td>{{ item.activity_type }}</td>
+                                        <td>
+                                            {{ item.activity_value }}
+                                            {{ item.activity_units or "" }}
+                                        </td>
+                                        <td>
+                                            {{ item.pchembl_value or "N/A" }}
+                                        </td>
+                                        <td>
+                                            {{ item.evidence_score }}/100
+                                            <br>
+                                            <small>
+                                                {{ item.evidence_label }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            ChEMBL<br>
+                                            {{ item.document_chembl_id
+                                                or "N/A" }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% else %}
+                <section class="panel">
+                    <p>No supported activity records were retrieved.</p>
+                </section>
+            {% endif %}
+
+            <div class="warning">
+                Computational indicators require expert interpretation
+                and experimental validation.
+            </div>
+        {% endif %}
+    </main>
+</body>
+</html>

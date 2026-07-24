@@ -1,0 +1,11 @@
+Flask
+requests
+pandas
+numpy
+plotly
+torch
+transformers
+scikit-learn
+biopython
+rdkit
+python-dotenv

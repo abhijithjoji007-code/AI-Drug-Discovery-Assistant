@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>AI Drug Discovery Assistant</title>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+<body>
+    <main class="container">
+        <h1>AI Drug Discovery Assistant</h1>
+
+        <p class="subtitle">
+            Explore protein similarity and reported drug-target
+            bioactivity evidence.
+        </p>
+
+        <div class="warning">
+            Research and educational use only. Results do not provide
+            medical advice or prove clinical effectiveness.
+        </div>
+
+        <section class="panel">
+            <h2>Analyze a protein</h2>
+
+            <form action="/analyze" method="post">
+                <input
+                    type="hidden"
+                    name="analysis_type"
+                    value="protein"
+                >
+
+                <label for="protein_sequence">
+                    Amino-acid sequence
+                </label>
+
+                <textarea
+                    id="protein_sequence"
+                    name="protein_sequence"
+                    rows="12"
+                    placeholder="Paste a FASTA or amino-acid sequence"
+                    required
+                ></textarea>
+
+                <button type="submit">
+                    Analyze protein
+                </button>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h2>Analyze a drug or compound</h2>
+
+            <form action="/analyze" method="post">
+                <input
+                    type="hidden"
+                    name="analysis_type"
+                    value="drug"
+                >
+
+                <label for="drug_name">
+                    Drug or compound name
+                </label>
+
+                <input
+                    id="drug_name"
+                    name="drug_name"
+                    type="text"
+                    placeholder="For example: aspirin"
+                    required
+                >
+
+                <button type="submit">
+                    Analyze compound
+                </button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

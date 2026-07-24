@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Epidermal growth factor receptor",
+    "gene": "EGFR",
+    "uniprot_id": "P00533",
+    "chembl_target_id": "CHEMBL203",
+    "target_type": "Kinase",
+    "sequence": "PASTE_THE_COMPLETE_UNIPROT_SEQUENCE_HERE"
+  },
+  {
+    "name": "Cyclooxygenase-2",
+    "gene": "PTGS2",
+    "uniprot_id": "P35354",
+    "chembl_target_id": "CHEMBL230",
+    "target_type": "Enzyme",
+    "sequence": "PASTE_THE_COMPLETE_UNIPROT_SEQUENCE_HERE"
+  },
+  {
+    "name": "Angiotensin-converting enzyme",
+    "gene": "ACE",
+    "uniprot_id": "P12821",
+    "chembl_target_id": "CHEMBL1808",
+    "target_type": "Enzyme",
+    "sequence": "PASTE_THE_COMPLETE_UNIPROT_SEQUENCE_HERE"
+  }
+]
