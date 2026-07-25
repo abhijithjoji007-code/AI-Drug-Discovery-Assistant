@@ -7,6 +7,12 @@ protein embeddings with PubChem and ChEMBL data to identify similar
 drug targets, retrieve reported compound-target activities, rank
 interaction evidence, and generate interpretable visual summaries.
 
+## Live Demo
+
+The deployed application is available here:
+
+**Live website:** https://your-site.onrender.com
+
 ## Key features
 
 - Protein-sequence and compound-name input modes
