@@ -11,7 +11,7 @@ interaction evidence, and generate interpretable visual summaries.
 
 The deployed application is available here:
 
-**Live website:** https://your-site.onrender.com
+**Live website:** https://ai-drug-discovery-assistant-34ai.onrender.com
 
 ## Key features
 
