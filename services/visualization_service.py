@@ -1,8 +1,15 @@
 from pathlib import Path
 
 import plotly.express as px
-from rdkit import Chem
-from rdkit.Chem import Draw
+try:
+    from rdkit import Chem
+    from rdkit.Chem import Draw
+
+    RDKIT_AVAILABLE = True
+except ImportError:
+    Chem = None
+    Draw = None
+    RDKIT_AVAILABLE = False
 
 
 def create_interaction_chart(interactions):
@@ -44,6 +51,9 @@ def create_interaction_chart(interactions):
 
 
 def create_structure_image(smiles: str, cid: int):
+    if not RDKIT_AVAILABLE:
+        return None
+
     if not smiles:
         return None
 

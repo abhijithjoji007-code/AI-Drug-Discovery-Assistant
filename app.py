@@ -31,12 +31,15 @@ from services.visualization_service import (
 
 
 app = Flask(__name__)
-
+app.config["MAX_CONTENT_LENGTH"] = 1 * 1024 * 1024
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
+@app.route("/health")
+def health():
+    return {"status": "healthy"}, 200
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
@@ -75,14 +78,17 @@ def analyze():
             )
         )
 
-    except Exception:
+    except Exception as error:
+        app.logger.exception("Analysis failed")
+
         return render_template(
             "results.html",
             error=(
-                "Analysis failed unexpectedly. Check the terminal "
-                "for details."
-            )
+                "The analysis could not be completed. "
+                "Please try again after a few moments."
         )
+    ), 500
+
 
 
 def analyze_protein():
@@ -224,6 +230,28 @@ def analyze_drug():
         lipinski=lipinski
     )
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template(
+        "results.html",
+        error="The requested page could not be found."
+    ), 404
+
+
+@app.errorhandler(413)
+def request_too_large(error):
+    return render_template(
+        "results.html",
+        error="The submitted input is too large."
+    ), 413
+
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return render_template(
+        "results.html",
+        error="The server encountered an unexpected error."
+    ), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

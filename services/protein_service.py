@@ -8,10 +8,24 @@ from transformers import AutoModel, AutoTokenizer
 VALID_AMINO_ACIDS = set("ACDEFGHIKLMNPQRSTVWY")
 MODEL_NAME = "facebook/esm2_t6_8M_UR50D"
 
+tokenizer = None
+model = None
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModel.from_pretrained(MODEL_NAME)
-model.eval()
+
+def load_model():
+    global tokenizer, model
+
+    if tokenizer is None:
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+    if model is None:
+        model = AutoModel.from_pretrained(
+            MODEL_NAME,
+            add_pooling_layer=False
+        )
+        model.eval()
+
+    return tokenizer, model
 
 
 def clean_sequence(sequence: str) -> str:
@@ -44,9 +58,9 @@ def validate_sequence(sequence: str) -> tuple[bool, str]:
     if len(sequence) < 20:
         return False, "The sequence is too short for meaningful analysis."
 
-    if len(sequence) > 1022:
+    if len(sequence) > 1000:
         return False, (
-            "The sequence is longer than 1022 amino acids. "
+            "The sequence is longer than 1000 amino acids. "
             "Use a shorter sequence for this first version."
         )
 
@@ -54,7 +68,9 @@ def validate_sequence(sequence: str) -> tuple[bool, str]:
 
 
 def generate_protein_embedding(sequence: str):
-    inputs = tokenizer(
+    current_tokenizer, current_model = load_model()
+
+    inputs = current_tokenizer(
         sequence,
         return_tensors="pt",
         truncation=True,
@@ -62,14 +78,16 @@ def generate_protein_embedding(sequence: str):
     )
 
     with torch.no_grad():
-        outputs = model(**inputs)
+        outputs = current_model(**inputs)
 
     residue_embeddings = outputs.last_hidden_state
+
     attention_mask = inputs["attention_mask"].unsqueeze(-1)
     masked_embeddings = residue_embeddings * attention_mask
 
     summed = masked_embeddings.sum(dim=1)
     counts = attention_mask.sum(dim=1).clamp(min=1)
+
     protein_embedding = summed / counts
 
     return protein_embedding.squeeze().cpu().numpy()

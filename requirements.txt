@@ -1,7 +1,7 @@
 Flask
 requests
 pandas
-numpy
+numpy==2.1.6
 plotly
 torch
 transformers
@@ -9,3 +9,4 @@ scikit-learn
 biopython
 rdkit
 python-dotenv
+gunicorn
