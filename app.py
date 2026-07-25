@@ -1,12 +1,7 @@
 from flask import Flask, render_template, request
 import requests
 
-from services.protein_service import (
-    clean_sequence,
-    validate_sequence,
-    generate_protein_embedding,
-    find_similar_targets
-)
+
 from services.pubchem_service import search_compound
 from services.chembl_service import (
     search_chembl_molecule,
@@ -22,11 +17,6 @@ from services.scoring_service import (
 from services.summary_service import (
     generate_drug_summary,
     generate_protein_summary
-)
-from services.visualization_service import (
-    create_interaction_chart,
-    create_structure_image,
-    calculate_lipinski_summary
 )
 
 
@@ -92,6 +82,14 @@ def analyze():
 
 
 def analyze_protein():
+    from services.protein_service import (
+        clean_sequence,
+        validate_sequence,
+        generate_protein_embedding,
+        find_similar_targets
+    )
+    from services.visualization_service import create_interaction_chart
+    raw_sequence = request.form.get("protein_sequence", "")
     raw_sequence = request.form.get("protein_sequence", "")
     sequence = clean_sequence(raw_sequence)
 
@@ -156,6 +154,13 @@ def analyze_protein():
 
 
 def analyze_drug():
+    from services.visualization_service import (
+        create_interaction_chart,
+        create_structure_image,
+        calculate_lipinski_summary
+    )
+
+    compound_name = request.form.get("drug_name", "").strip()
     compound_name = request.form.get("drug_name", "").strip()
 
     if not compound_name:
